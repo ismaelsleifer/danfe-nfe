@@ -20,7 +20,7 @@
     "require": {
         "php": ">=5.4.0",
         "mpdf/mpdf": "6.0.0",
-        "endroid/qrcode": "1.*@dev"
+        "endroid/qr-code": ">=3.6.1"
     },
     "autoload": {
         "psr-4": {
