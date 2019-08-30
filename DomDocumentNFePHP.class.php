@@ -1,6 +1,6 @@
 <?php
 
-namespace NFePHP\Extras;
+namespace sleifer\danfenfe;
 
 use \DOMDocument;
 
