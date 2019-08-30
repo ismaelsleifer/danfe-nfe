@@ -1,0 +1,30 @@
+{
+    "name": "sleifer/danfe-nfe",
+    "description": "Geração de pdf pleo xml das notas fiscais",
+    "keywords": [
+        "xml",
+        "nfce",
+        "extension",
+        "plugin"
+    ],
+    "homepage": "https://github.com/ismaelsleifer/danfe-nfe",
+    "type": "NFCE",
+    "license": "BSD-3-Clause",
+    "version": "1.0",
+    "authors": [{
+        "name": "Ismael Sleifer",
+        "email": "ismaelsleifer@gmail.com",
+        "homepage": "http://www.sleifer.com.br",
+        "role": "Developer"
+    }],
+    "require": {
+        "php": ">=5.4.0",
+        "mpdf/mpdf": "6.0.0",
+        "endroid/qrcode": "1.*@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "sleifer\\jscontrol\\": ""
+        }
+    }
+}
