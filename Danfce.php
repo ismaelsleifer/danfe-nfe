@@ -1,6 +1,6 @@
 <?php
 
-namespace NFePHP\Extras;
+namespace sleifer\danfe;
 
 /**
  * Classe para a impressão em PDF do Docuimento Auxiliar de NFe Consumidor
@@ -29,9 +29,9 @@ set_time_limit(1800);
 //classes utilizadas
 use mPDF;
 use Endroid\QrCode\QrCode;
-use NFePHP\Extras\CommonNFePHP;
-use NFePHP\Extras\DocumentoNFePHP;
-use NFePHP\Extras\DomDocumentNFePHP;
+use sleifer\CommonNFePHP;
+use sleifer\DocumentoNFePHP;
+use sleifer\DomDocumentNFePHP;
 
 /**
  * Classe DanfceNFePHP

@@ -24,7 +24,7 @@
     },
     "autoload": {
         "psr-4": {
-            "sleifer\\jscontrol\\": ""
+            "sleifer\\danfenfe\\": ""
         }
     }
 }
