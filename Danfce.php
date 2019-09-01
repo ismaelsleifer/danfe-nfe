@@ -29,9 +29,7 @@ set_time_limit(1800);
 //classes utilizadas
 use mPDF;
 use Endroid\QrCode\QrCode;
-use sleifer\danfenfe\CommonNFePHP;
-use sleifer\danfenfe\DocumentoNFePHP;
-use sleifer\danfenfe\DomDocumentNFePHP;
+
 
 /**
  * Classe DanfceNFePHP
@@ -170,6 +168,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         '53' => 'http://dec.fazenda.df.gov.br/NFCE/'
     );
 
+    protected $script_js = null;
     /**
      * __contruct
      *
@@ -358,6 +357,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         $vProd = $this->pSimpleGetValue($this->ICMSTot, "vProd");
         $vDesc  = $this->pSimpleGetValue($this->ICMSTot, "vDesc");
         $vOutro = $this->pSimpleGetValue($this->ICMSTot, "vOutro");
+        $vFrete = $this->pSimpleGetValue($this->ICMSTot, "vFrete");
         $vNF = $this->pSimpleGetValue($this->ICMSTot, "vNF");
         $qtdItens = $this->det->length;
         $urlQR = $this->urlQR;
@@ -461,7 +461,8 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         $this->html .= "<table width=\"100%\">\n";
         $this->html .= "<tr>\n";
         $this->html .= "<td colspan=\"3\" class=\"tCenter\"><strong>".
-                htmlspecialchars("DANFE NFC-e - DOCUMENTO AUXILIAR DA NOTA FISCAL DE CONSUMIDOR ELETRÔNICA")."</strong></td>\n";
+                htmlspecialchars("DANFE NFC-e - DOCUMENTO AUXILIAR DA NOTA FISCAL DE CONSUMIDOR ELETRÔNICA")."</strong><br>\n" .
+                htmlspecialchars("Não permite aproveitamento de crédito de ICMS")."</td>\n";
         $this->html .= "</tr>\n";
         $this->html .= "</table>\n";
         
@@ -495,6 +496,14 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
             $this->html .= "<tr>\n";
             $this->html .= "<td class=\"tLeft\">".htmlspecialchars('Acréscimos R$')."</td>\n";
             $this->html .= "<td class=\"tRight\">".number_format($vOutro, 2, ',', '.')."</td>\n";
+            $this->html .= "</tr>\n";
+            $this->html .= "<tr>\n";
+            $hasAD = true;
+        }
+        if ($vFrete != '0.00') {
+            $this->html .= "<tr>\n";
+            $this->html .= "<td class=\"tLeft\">".htmlspecialchars('Frete R$')."</td>\n";
+            $this->html .= "<td class=\"tRight\">".number_format($vFrete, 2, ',', '.')."</td>\n";
             $this->html .= "</tr>\n";
             $this->html .= "<tr>\n";
             $hasAD = true;
@@ -843,12 +852,25 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
                 $this->papel=array($this->papel[0], $mpdf->y + $m);
             }
             $this->mpdf=new mPDF('', $this->papel, 0, '', $m, $m, $m, 0, 0, 'P');
+
+            if($this->script_js){
+                $this->mpdf->setJs($this->script_js);
+            }
+
             $this->mpdf->WriteHTML($this->html);
             return $this->mpdf->Output($nome, $destino);
         } else {
             echo $this->html;
         }
         return true;
+    }
+
+    public function setJs($script){
+        $this->script_js = $script;
+    }
+
+    public function getJs(){
+        return $this->script_js;
     }
     
     /**
@@ -954,19 +976,21 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
      */
     private function imgQR($seq, $dimensao = 165)
     {
+
+        //die($seq);
         $dimensao = $dimensao<100?100:$dimensao; //Dimensão mínima para leitura 100px = 26.4mm
         $dimensao = $dimensao>230?230:$dimensao; //Dimensão máxima para layout 230px = 60.8mm
         $quietZone = $dimensao<=100?12:$dimensao*0.10; // Acima de 25mm quiet zone de 10%
         $qrCode = new QrCode();
-        $qrCode->setText($seq)
-            ->setSize($dimensao)
-            ->setPadding($quietZone)
-            ->setErrorCorrection('low')
-            ->setForegroundColor(array('r' => 0, 'g' => 0, 'b' => 0, 'a' => 0))
-            ->setBackgroundColor(array('r' => 255, 'g' => 255, 'b' => 255, 'a' => 0))
-            ->setLabel('')
-            ->setLabelFontSize(16);
-        $img = $qrCode->get();
+        $qrCode->setText($seq);
+        $qrCode->setSize($dimensao);
+        //$qrCode->setPadding($quietZone);
+        //$qrCode->setErrorCorrection('low');
+        $qrCode->setForegroundColor(array('r' => 0, 'g' => 0, 'b' => 0, 'a' => 0));
+        $qrCode->setBackgroundColor(array('r' => 255, 'g' => 255, 'b' => 255, 'a' => 0));
+        $qrCode->setLabel('');
+        $qrCode->setLabelFontSize(16);
+        $img = $qrCode->writeString();
         
         //Retorno src em Base64 para melhor utilização em ambos os formatos (PDF/HTML)
         //evita falhas de endereço da imagem e reduz o I/O no disco porém
