@@ -358,6 +358,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         $vDesc  = $this->pSimpleGetValue($this->ICMSTot, "vDesc");
         $vOutro = $this->pSimpleGetValue($this->ICMSTot, "vOutro");
         $vFrete = $this->pSimpleGetValue($this->ICMSTot, "vFrete");
+        $vPag = $this->pSimpleGetValue($this->detPag, "vPag"); 
         $vNF = $this->pSimpleGetValue($this->ICMSTot, "vNF");
         $qtdItens = $this->det->length;
         $urlQR = $this->urlQR;
