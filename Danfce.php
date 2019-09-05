@@ -29,7 +29,7 @@ set_time_limit(1800);
 //classes utilizadas
 use mPDF;
 use Endroid\QrCode\QrCode;
-
+use yii\helpers\VarDumper;
 
 /**
  * Classe DanfceNFePHP
@@ -53,6 +53,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
     protected $ide;
     protected $enderDest;
     protected $ICMSTot;
+    protected $detPag;
     protected $imposto;
     protected $emit;
     protected $enderEmit;
@@ -210,6 +211,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
             $this->pag        = $this->dom->getElementsByTagName("pag");
             $this->imposto    = $this->dom->getElementsByTagName("imposto")->item(0);
             $this->ICMSTot    = $this->dom->getElementsByTagName("ICMSTot")->item(0);
+            $this->detPag     = $this->dom->getElementsByTagName("detPag")->item(0);
         }
         $this->idToken = $idToken;
         $this->emitToken = $emitToken;
@@ -358,7 +360,6 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         $vDesc  = $this->pSimpleGetValue($this->ICMSTot, "vDesc");
         $vOutro = $this->pSimpleGetValue($this->ICMSTot, "vOutro");
         $vFrete = $this->pSimpleGetValue($this->ICMSTot, "vFrete");
-        $vPag = $this->pSimpleGetValue($this->detPag, "vPag"); 
         $vNF = $this->pSimpleGetValue($this->ICMSTot, "vNF");
         $qtdItens = $this->det->length;
         $urlQR = $this->urlQR;
@@ -495,7 +496,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         }
         if ($vOutro != '0.00') {
             $this->html .= "<tr>\n";
-            $this->html .= "<td class=\"tLeft\">".htmlspecialchars('Acréscimos R$')."</td>\n";
+            $this->html .= "<td class=\"tLeft\">".htmlspecialchars('Taxa de entrega R$')."</td>\n";
             $this->html .= "<td class=\"tRight\">".number_format($vOutro, 2, ',', '.')."</td>\n";
             $this->html .= "</tr>\n";
             $this->html .= "<tr>\n";
@@ -513,7 +514,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         if ($hasAD) {
             $this->html .= "<tr>\n";
             $this->html .= "<td class=\"tLeft\">".htmlspecialchars('Valor a Pagar R$')."</td>\n";
-            $this->html .= "<td class=\"tRight\">".number_format($vOutro, 2, ',', '.')."</td>\n";
+            $this->html .= "<td class=\"tRight\">".number_format($vNF, 2, ',', '.')."</td>\n";
             $this->html .= "</tr>\n";
         }
         // Formas de Pagamentos
@@ -521,7 +522,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         $this->html .= "<th class=\"tLeft\">FORMA DE PAGAMENTO</th>\n";
         $this->html .= "<th class=\"tRight\">VALOR PAGO</th>\n";
         $this->html .= "</tr>\n";
-        $this->html .= self::pagamento($this->pag);        
+        $this->html .= self::pagamento($this->pag);
         $this->html .= "</table>\n";
         
         // Valor aproximado dos produtos
@@ -607,7 +608,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         
         $this->html .= "<table width=\"100%\" class=\"noBorder\">\n";
         $this->html .= "<tr>\n";
-        $this->html .= "<td colspan=\"3\" class=\"rodape tCenter\">Powered by NFePHP (GNU/GPLv3 GNU/LGPLv3) © www.nfephp.org</td>\n";
+        $this->html .= "<td colspan=\"3\" class=\"rodape tCenter\">Emitida por SGP Sleifer Tec.</td>\n";
         $this->html .= "</tr>\n";
         $this->html .= "</table>\n";
         
@@ -631,6 +632,7 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
         foreach ($pag as $pagI) {
             $tPag = $this->pSimpleGetValue($pagI, "tPag");
             $tPagNome = $this->tipoPag($tPag);
+            $vTroco = $this->pSimpleGetValue($pagI, "vTroco");
             $vPag = number_format($this->pSimpleGetValue($pagI, "vPag"), 2, ",", ".");
             $card = $pagI->getElementsByTagName("card")->item(0);
             //Informação da Bandeira caso seja cartão
@@ -645,6 +647,10 @@ class Danfce extends CommonNFePHP implements DocumentoNFePHP
                 $pagHtml .= "<tr>\n";
                 $pagHtml .= "<td class=\"tLeft\">".htmlspecialchars($tPagNome)."</td>\n";
                 $pagHtml .= "<td class=\"tRight\">{$vPag}</td>\n";
+                $pagHtml .= "</tr>\n";
+                $pagHtml .= "<tr>\n";
+                $pagHtml .= "<td class=\"tLeft\">Troco</td>\n";
+                $pagHtml .= "<td class=\"tRight\">{$vTroco}</td>\n";
                 $pagHtml .= "</tr>\n";
             }
         } //fim foreach
